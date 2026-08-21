@@ -75,7 +75,7 @@ with col_logo:
 
 with col_title:
     st.title("EgeHava & 8 Şehir Akıllı Aktivite Rehberi")
-    st.caption("Doğrudan Google Maps Entegrasyonu | Yeşil & Mavi Tema | Sıcaklık Grafiği")
+    st.caption("Çoklu Otomatik Aktivite Önerileri | Google Maps Entegrasyonu | Yeşil & Mavi Tema")
 
 st.divider()
 
@@ -88,7 +88,7 @@ ege_sehırleri = [
 sehir = st.sidebar.selectbox("Şehir Seçin", ege_sehırleri)
 tarih = st.sidebar.date_input("Tarih Seçin", datetime.date.today())
 
-# Mevsim Tespiti
+# Mevsim Tespiti (Mayıs - Eylül: Yaz, Diğerleri: Kış)
 secilen_ay = tarih.month
 is_summer = secilen_ay in [5, 6, 7, 8, 9]
 
@@ -98,7 +98,7 @@ show_temp = st.sidebar.checkbox("Sıcaklık", value=True)
 show_wind = st.sidebar.checkbox("Rüzgar Hızı", value=True)
 show_humidity = st.sidebar.checkbox("Nem Oranı", value=True)
 
-# VERİ SETİ
+# VERİ SETİ (8 Şehir)
 mekanlar = [
     # İZMİR
     {"sehir": "İzmir", "ad": "Çeşme Ilıca Plajı", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 38.3075, "lon": 26.3572, "deniz_temp": 24},
@@ -190,28 +190,35 @@ st.plotly_chart(fig_temp, use_container_width=True)
 
 st.divider()
 
-# 3. AKTİVİTE SEÇİM PANELERİ
+# 3. BİRDEN FAZLA OTOMATİK AKTİVİTE ÖNERİ MANTIĞI
 city_df = df_mekanlar[df_mekanlar["sehir"] == sehir]
-mevcut_kategoriler = list(city_df["kat"].unique())
 
-st.subheader("🎯 Aktivite Filtreleme ve Seçim Paneli")
+# Mevsime uygun olan TÜM kategorileri tespit et (Birden Fazla Otomatik Öneri)
+mevsim_tipi = "Yaz" if is_summer else "Kış"
+otomatik_kategoriler = list(city_df[city_df["tip"] == mevsim_tipi]["kat"].unique())
+
+# Tüm kategorilerin listesi
+tum_kategoriler = list(city_df["kat"].unique())
+
+st.subheader("🎯 Hava Durumuna Göre Akıllı Aktivite Önerileri")
 col_sel1, col_sel2 = st.columns([2, 1])
 
 with col_sel1:
     secilen_kategoriler = st.multiselect(
-        "Görüntülemek istediğiniz aktivite türlerini seçin:",
-        options=mevcut_kategoriler,
-        default=mevcut_kategoriler
+        "Tarih/Hava durumuna göre otomatik seçilen aktivite türleri (Değiştirebilirsiniz):",
+        options=tum_kategoriler,
+        default=otomatik_kategoriler  # BİRDEN FAZLA KATEGORİ OTOMATİK SEÇİLİR
     )
 
 with col_sel2:
-    st.write("**Mevsim Modu:**")
+    st.write("**Mevsimsel Öneri Durumu:**")
     if is_summer:
-        st.success("☀️ Otomatik Yaz Modu Aktif")
+        st.success(f"☀️ Yaz Modu: {len(otomatik_kategoriler)} Farklı Aktivite Türü Öneriliyor")
     else:
-        st.info("❄️ Otomatik Kış Modu Aktif")
+        st.info(f"❄️ Kış Modu: {len(otomatik_kategoriler)} Farklı Aktivite Türü Öneriliyor")
 
-filtered_df = city_df[(city_df["kat"].isin(secilen_kategoriler)) & (city_df["tip"] == ("Yaz" if is_summer else "Kış"))]
+# Filtrelenmiş Liste
+filtered_df = city_df[city_df["kat"].isin(secilen_kategoriler)]
 
 st.divider()
 
@@ -258,7 +265,7 @@ with col_left:
                 """, unsafe_allow_html=True)
             st.write("")
     else:
-        st.warning("Seçtiğiniz kriterlere uygun aktivite bulunamadı.")
+        st.warning("Seçtiğiniz kriterlere uygun aktivite bulunamadı. Lütfen filtreleme alanından başka bir kategori ekleyin.")
 
 with col_right:
     st.subheader("🗺️ Canlı Google Maps Görünümü")
