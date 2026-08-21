@@ -71,7 +71,7 @@ with col_logo:
 
 with col_title:
     st.title("EgeHava & 8 Şehir Akıllı Aktivite Rehberi")
-    st.caption("Çoklu Plaj Önerileri | Otomatik Tarih & Şehir Analizi | Google Maps Entegrasyonu")
+    st.caption("Plajlar, Bisiklet & Doğa Yürüyüşü Rotaları | Canlı Google Maps Entegrasyonu")
 
 st.divider()
 
@@ -94,57 +94,53 @@ show_temp = st.sidebar.checkbox("Sıcaklık", value=True)
 show_wind = st.sidebar.checkbox("Rüzgar Hızı", value=True)
 show_humidity = st.sidebar.checkbox("Nem Oranı", value=True)
 
-# GENİŞLETİLMİŞ VE ÇOKLU PLAJLI VERİ SETİ
+# BİSİKLET VE DOĞA YÜRÜYÜŞÜ İLE GENİŞLETİLMİŞ VERİ SETİ
 mekanlar = [
-    # 1. İZMİR PLAJLARI VE AKTİVİTELERİ
+    # 1. İZMİR
     {"sehir": "İzmir", "ad": "Çeşme Ilıca Plajı", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 38.3075, "lon": 26.3572, "deniz_temp": 24},
     {"sehir": "İzmir", "ad": "Alaçatı Çark Plajı & Sörf", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 38.2520, "lon": 26.3880, "deniz_temp": 23},
     {"sehir": "İzmir", "ad": "Urla Demircili Plajı", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 38.2389, "lon": 26.7028, "deniz_temp": 22},
-    {"sehir": "İzmir", "ad": "Dikili Bademli Kalem Adası Plajı", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 39.0111, "lon": 26.7861, "deniz_temp": 23},
-    {"sehir": "İzmir", "ad": "Foça Eski Foça Plajı", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 38.6703, "lon": 26.7575, "deniz_temp": 22},
-    {"sehir": "İzmir", "ad": "Seferihisar Akkum Plajı", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 38.1969, "lon": 26.7864, "deniz_temp": 23},
+    {"sehir": "İzmir", "ad": "Kordon - Karşıyaka Bisiklet Yolu", "tip": "Yaz", "kat": "Bisiklet Turu", "lat": 38.4350, "lon": 27.1380, "deniz_temp": None},
+    {"sehir": "İzmir", "ad": "Yamanlar Dağı Doğa Yürüyüşü Parkuru", "tip": "Yaz", "kat": "Doğa Yürüyüşü", "lat": 38.5300, "lon": 27.1600, "deniz_temp": None},
     {"sehir": "İzmir", "ad": "Efes Antik Kenti", "tip": "Kış", "kat": "Kültür & Tarih", "lat": 37.9411, "lon": 27.3419, "deniz_temp": None},
     {"sehir": "İzmir", "ad": "Balçova Termal Tesisleri", "tip": "Kış", "kat": "Termal & Spa", "lat": 38.3892, "lon": 27.0425, "deniz_temp": None},
 
-    # 2. MUĞLA PLAJLARI VE AKTİVİTELERİ
+    # 2. MUĞLA
     {"sehir": "Muğla", "ad": "Fethiye Ölüdeniz Kumburnu Plajı", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 36.5492, "lon": 29.1156, "deniz_temp": 26},
-    {"sehir": "Muğla", "ad": "Marmaris İchmeler Plajı", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 36.8005, "lon": 28.2325, "deniz_temp": 25},
-    {"sehir": "Muğla", "ad": "Bodrum Bitez Plajı", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 37.0308, "lon": 27.3828, "deniz_temp": 25},
-    {"sehir": "Muğla", "ad": "Datça Palamutbükü Plajı", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 36.6711, "lon": 27.5028, "deniz_temp": 24},
+    {"sehir": "Muğla", "ad": "Marmaris İçmeler Plajı", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 36.8005, "lon": 28.2325, "deniz_temp": 25},
     {"sehir": "Muğla", "ad": "Akyaka Azmak & Plaj Alanı", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 37.0505, "lon": 28.3245, "deniz_temp": 24},
-    {"sehir": "Muğla", "ad": "Dalyan İztuzu Plajı", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 36.7972, "lon": 28.6189, "deniz_temp": 26},
+    {"sehir": "Muğla", "ad": "Likya Yolu Trekking Parkuru (Fethiye)", "tip": "Yaz", "kat": "Doğa Yürüyüşü", "lat": 36.5160, "lon": 29.1500, "deniz_temp": None},
+    {"sehir": "Muğla", "ad": "Dalaman - Sarıgerme Bisiklet Rotası", "tip": "Yaz", "kat": "Bisiklet Turu", "lat": 36.7050, "lon": 28.7000, "deniz_temp": None},
     {"sehir": "Muğla", "ad": "Sultaniye Kaplıcaları", "tip": "Kış", "kat": "Termal & Spa", "lat": 36.9214, "lon": 28.5833, "deniz_temp": None},
-    {"sehir": "Muğla", "ad": "Marmaris Kalesi", "tip": "Kış", "kat": "Kültür & Tarih", "lat": 36.8508, "lon": 28.2725, "deniz_temp": None},
 
-    # 3. AYDIN PLAJLARI VE AKTİVİTELERİ
+    # 3. AYDIN
     {"sehir": "Aydın", "ad": "Kuşadası Kadınlar Denizi Plajı", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 37.8483, "lon": 27.2458, "deniz_temp": 25},
     {"sehir": "Aydın", "ad": "Didim Altınkum Plajı", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 37.3575, "lon": 27.2831, "deniz_temp": 24},
-    {"sehir": "Aydın", "ad": "Kuşadası Sevgi Plajı", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 37.7619, "lon": 27.2622, "deniz_temp": 25},
-    {"sehir": "Aydın", "ad": "Dilek Yarımadası İçmeler Koyu", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 37.7125, "lon": 27.1583, "deniz_temp": 24},
-    {"sehir": "Aydın", "ad": "Afrodisias Antik Kenti", "tip": "Kış", "kat": "Kültür & Tarih", "lat": 37.6403, "lon": 28.7233, "deniz_temp": None},
+    {"sehir": "Aydın", "ad": "Dilek Yarımadası Milli Parkı Doğa Yürüyüşü", "tip": "Yaz", "kat": "Doğa Yürüyüşü", "lat": 37.6950, "lon": 27.1650, "deniz_temp": None},
+    {"sehir": "Aydın", "ad": "Bafa Gölü Bisiklet Parkuru", "tip": "Yaz", "kat": "Bisiklet Turu", "lat": 37.5000, "lon": 27.4200, "deniz_temp": None},
 
     # 4. MANİSA
-    {"sehir": "Manisa", "ad": "Spil Dağı Milli Parkı", "tip": "Yaz", "kat": "Doğa Yürüyüşü", "lat": 38.5601, "lon": 27.4485, "deniz_temp": None},
-    {"sehir": "Manisa", "ad": "Kula Volkanik Jeoparkı", "tip": "Yaz", "kat": "Doğa Gezisi", "lat": 38.5828, "lon": 28.6142, "deniz_temp": None},
+    {"sehir": "Manisa", "ad": "Spil Dağı Milli Parkı Yürüyüş Rotası", "tip": "Yaz", "kat": "Doğa Yürüyüşü", "lat": 38.5601, "lon": 27.4485, "deniz_temp": None},
+    {"sehir": "Manisa", "ad": "Kula Volkanik Jeoparkı Bisiklet Yolu", "tip": "Yaz", "kat": "Bisiklet Turu", "lat": 38.5828, "lon": 28.6142, "deniz_temp": None},
     {"sehir": "Manisa", "ad": "Sardes Antik Kenti", "tip": "Kış", "kat": "Kültür & Tarih", "lat": 38.4883, "lon": 28.0403, "deniz_temp": None},
-    {"sehir": "Manisa", "ad": "Kurşunlu Kaplıcaları", "tip": "Kış", "kat": "Termal & Spa", "lat": 38.4528, "lon": 28.1408, "deniz_temp": None},
 
     # 5. DENİZLİ
     {"sehir": "Denizli", "ad": "Pamukkale Travertenleri", "tip": "Yaz", "kat": "Kültür & Doğa", "lat": 37.9249, "lon": 29.1238, "deniz_temp": None},
-    {"sehir": "Denizli", "ad": "Kleopatra Antik Havuzu", "tip": "Yaz", "kat": "Doğal Yüzme", "lat": 37.9268, "lon": 29.1245, "deniz_temp": None},
-    {"sehir": "Denizli", "ad": "Karahayıt Termal Tesisleri", "tip": "Kış", "kat": "Termal & Spa", "lat": 37.9622, "lon": 29.1031, "deniz_temp": None},
+    {"sehir": "Denizli", "ad": "Honaz Dağı Milli Parkı Doğa Yürüyüşü", "tip": "Yaz", "kat": "Doğa Yürüyüşü", "lat": 37.7600, "lon": 29.2800, "deniz_temp": None},
+    {"sehir": "Denizli", "ad": "Çamlık Parkı Bisiklet Yolu", "tip": "Yaz", "kat": "Bisiklet Turu", "lat": 37.7450, "lon": 29.0950, "deniz_temp": None},
 
     # 6. AFYONKARAHİSAR
-    {"sehir": "Afyonkarahisar", "ad": "Frig Vadisi Göynük", "tip": "Yaz", "kat": "Doğa Yürüyüşü", "lat": 39.0285, "lon": 30.5283, "deniz_temp": None},
+    {"sehir": "Afyonkarahisar", "ad": "Frig Vadisi Yürüyüş Parkuru", "tip": "Yaz", "kat": "Doğa Yürüyüşü", "lat": 39.0285, "lon": 30.5283, "deniz_temp": None},
+    {"sehir": "Afyonkarahisar", "ad": "Frig Yolu Bisiklet Parkuru", "tip": "Yaz", "kat": "Bisiklet Turu", "lat": 38.9800, "lon": 30.5100, "deniz_temp": None},
     {"sehir": "Afyonkarahisar", "ad": "Gazlıgöl Termal Kaplıcaları", "tip": "Kış", "kat": "Termal & Spa", "lat": 38.9388, "lon": 30.5050, "deniz_temp": None},
 
     # 7. UŞAK
-    {"sehir": "Uşak", "ad": "Ulubey Kanyonu (Cam Teras)", "tip": "Yaz", "kat": "Doğa Yürüyüşü", "lat": 38.4230, "lon": 29.2940, "deniz_temp": None},
-    {"sehir": "Uşak", "ad": "Kayaağıl Termal Tesisleri", "tip": "Kış", "kat": "Termal & Spa", "lat": 38.6410, "lon": 29.3520, "deniz_temp": None},
+    {"sehir": "Uşak", "ad": "Ulubey Kanyonu Doğa Yürüyüşü", "tip": "Yaz", "kat": "Doğa Yürüyüşü", "lat": 38.4230, "lon": 29.2940, "deniz_temp": None},
+    {"sehir": "Uşak", "ad": "Gökyayla Bisiklet Parkuru", "tip": "Yaz", "kat": "Bisiklet Turu", "lat": 38.5500, "lon": 29.4200, "deniz_temp": None},
 
     # 8. KÜTAHYA
-    {"sehir": "Kütahya", "ad": "Aizanoi Antik Kenti", "tip": "Yaz", "kat": "Kültür & Tarih", "lat": 39.2012, "lon": 29.6120, "deniz_temp": None},
-    {"sehir": "Kütahya", "ad": "Yoncalı Termal Kaplıcaları", "tip": "Kış", "kat": "Termal & Spa", "lat": 39.4620, "lon": 29.8650, "deniz_temp": None},
+    {"sehir": "Kütahya", "ad": "Murat Dağı Doğa Yürüyüşü ve Kamp Alanı", "tip": "Yaz", "kat": "Doğa Yürüyüşü", "lat": 38.9400, "lon": 29.6200, "deniz_temp": None},
+    {"sehir": "Kütahya", "ad": "Aizanoi Antik Kenti Bisiklet Turu", "tip": "Yaz", "kat": "Bisiklet Turu", "lat": 39.2012, "lon": 29.6120, "deniz_temp": None},
 ]
 
 df_mekanlar = pd.DataFrame(mekanlar)
@@ -198,41 +194,37 @@ st.plotly_chart(fig_temp, use_container_width=True)
 
 st.divider()
 
-# 3. SEÇİLEN TARİHE VE ŞEHRE GÖRE DİNAMİK/OTOMATİK ÖNERİ
+# 3. TARİHE VE ŞEHRE GÖRE DİNAMİK ÖNERİ
 city_df = df_mekanlar[df_mekanlar["sehir"] == sehir]
 
-# Mevsime ve Şehre Göre Uygun Tüm Kategorileri Otomatik Seç
 mevsim_tipi = "Yaz" if is_summer else "Kış"
 otomatik_kategoriler = list(city_df[city_df["tip"] == mevsim_tipi]["kat"].unique())
-
-# Filtre Seçim Listesi İçin Tüm Şehir Kategorileri
 tum_kategoriler = list(city_df["kat"].unique())
 
-st.subheader(f"🎯 {sehir} İçin Otomatik Önerilen Aktiviteler ve Plajlar")
+st.subheader(f"🎯 {sehir} İçin Akıllı Aktivite, Plaj ve Rota Önerileri")
 col_sel1, col_sel2 = st.columns([2, 1])
 
 with col_sel1:
     secilen_kategoriler = st.multiselect(
         f"Seçilen Tarihe ({tarih.strftime('%d.%m.%Y')}) Göre Otomatik Seçilen Kategoriler:",
         options=tum_kategoriler,
-        default=otomatik_kategoriler  # OTOMATİK OLARAK BİRDEN FAZLA PLAJ/AKTİVİTE GELİR
+        default=otomatik_kategoriler
     )
 
 with col_sel2:
     st.write("**Mevsimsel Analiz:**")
     if is_summer:
-        st.success(f"☀️ Yaz Modu: {sehir} için uygun plajlar ve yazlık aktiviteler getirildi.")
+        st.success(f"☀️ Yaz Modu: {sehir} için uygun plajlar, bisiklet ve doğa yürüyüşü rotaları listelendi.")
     else:
-        st.info(f"❄️ Kış Modu: {sehir} için kültür ve termal/spa alanları getirildi.")
+        st.info(f"❄️ Kış Modu: {sehir} için kültür ve termal/spa alanları listelendi.")
 
 filtered_df = city_df[city_df["kat"].isin(secilen_kategoriler)]
 
 st.divider()
 
-# 4. AKTİVİTE VE PLAJ LİSTESİ + GOOGLE MAPS HARİTASI
+# 4. AKTİVİTE LİSTESİ VE GOOGLE MAPS
 col_left, col_right = st.columns([1, 1])
 
-# Session state reset mantığı
 if "selected_place" not in st.session_state or st.session_state.get("current_city") != sehir:
     if not filtered_df.empty:
         st.session_state["selected_place"] = filtered_df.iloc[0]["ad"]
@@ -241,7 +233,7 @@ if "selected_place" not in st.session_state or st.session_state.get("current_cit
     st.session_state["current_city"] = sehir
 
 with col_left:
-    st.subheader(f"📌 Önerilen Plaj ve Aktiviteler ({len(filtered_df)} Adet)")
+    st.subheader(f"📌 Önerilen Aktiviteler & Rotalar ({len(filtered_df)} Adet)")
 
     if not filtered_df.empty:
         for idx, row in filtered_df.iterrows():
@@ -257,7 +249,6 @@ with col_left:
             </div>
             """, unsafe_allow_html=True)
 
-            # Haritada Odaklan Butonu
             if st.button(f"🗺️ Haritada {row['ad']} Konumuna Odaklan", key=f"btn_{idx}"):
                 st.session_state["selected_place"] = row["ad"]
                 st.session_state["selected_lat"] = row["lat"]
@@ -283,7 +274,6 @@ with col_right:
         
         st.info(f"📍 Haritada Gösterilen Mekan: **{place_name}**")
         
-        # Google Maps Embed HTML iframe Kodu
         google_maps_html = f"""
         <iframe 
             width="100%" 
