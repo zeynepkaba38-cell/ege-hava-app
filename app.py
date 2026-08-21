@@ -1,8 +1,8 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import plotly.express as px
 import plotly.graph_objects as go
+import streamlit.components.v1 as components
 import datetime
 
 # 1. Sayfa Ayarları
@@ -39,7 +39,7 @@ st.markdown("""
         font-weight: 700;
         box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25);
     }
-    /* Yol Tarifi Butonu - Yeşil / Mavi */
+    /* Yol Tarifi Butonu */
     .gmaps-btn {
         background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         color: white !important;
@@ -62,7 +62,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Head Banner (Yeşil & Mavi Logo)
+# Head Banner
 col_logo, col_title = st.columns([1, 6])
 with col_logo:
     st.markdown("""
@@ -75,7 +75,7 @@ with col_logo:
 
 with col_title:
     st.title("EgeHava & 8 Şehir Akıllı Aktivite Rehberi")
-    st.caption("Doğal Yeşil & Mavi Tema | Sıcaklık Grafiği, Canlı Harita ve Yol Tarifi Entegrasyonu")
+    st.caption("Doğrudan Google Maps Entegrasyonu | Yeşil & Mavi Tema | Sıcaklık Grafiği")
 
 st.divider()
 
@@ -98,59 +98,57 @@ show_temp = st.sidebar.checkbox("Sıcaklık", value=True)
 show_wind = st.sidebar.checkbox("Rüzgar Hızı", value=True)
 show_humidity = st.sidebar.checkbox("Nem Oranı", value=True)
 
-# 8 ŞEHRİ İÇEREN VERİ SETİ
+# VERİ SETİ
 mekanlar = [
-    # 1. İZMİR
+    # İZMİR
     {"sehir": "İzmir", "ad": "Çeşme Ilıca Plajı", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 38.3075, "lon": 26.3572, "deniz_temp": 24},
     {"sehir": "İzmir", "ad": "Alaçatı Rüzgar Sörfü Alanı", "tip": "Yaz", "kat": "Rüzgar Sörfü", "lat": 38.2520, "lon": 26.3880, "deniz_temp": 23},
-    {"sehir": "İzmir", "ad": "Efes Antik Kenti (Selçuk)", "tip": "Kış", "kat": "Kültür & Tarih", "lat": 37.9411, "lon": 27.3419, "deniz_temp": None},
+    {"sehir": "İzmir", "ad": "Efes Antik Kenti", "tip": "Kış", "kat": "Kültür & Tarih", "lat": 37.9411, "lon": 27.3419, "deniz_temp": None},
     {"sehir": "İzmir", "ad": "Balçova Termal Tesisleri", "tip": "Kış", "kat": "Termal & Spa", "lat": 38.3892, "lon": 27.0425, "deniz_temp": None},
 
-    # 2. MUĞLA
+    # MUĞLA
     {"sehir": "Muğla", "ad": "Fethiye Ölüdeniz", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 36.5492, "lon": 29.1156, "deniz_temp": 26},
     {"sehir": "Muğla", "ad": "Akyaka Rüzgar Sörfü Plajı", "tip": "Yaz", "kat": "Rüzgar Sörfü", "lat": 37.0505, "lon": 28.3245, "deniz_temp": 24},
-    {"sehir": "Muğla", "ad": "Sultaniye Kaplıcaları (Köyceğiz)", "tip": "Kış", "kat": "Termal & Spa", "lat": 36.9214, "lon": 28.5833, "deniz_temp": None},
+    {"sehir": "Muğla", "ad": "Sultaniye Kaplıcaları", "tip": "Kış", "kat": "Termal & Spa", "lat": 36.9214, "lon": 28.5833, "deniz_temp": None},
     {"sehir": "Muğla", "ad": "Marmaris Kalesi", "tip": "Kış", "kat": "Kültür & Tarih", "lat": 36.8508, "lon": 28.2725, "deniz_temp": None},
 
-    # 3. AYDIN
+    # AYDIN
     {"sehir": "Aydın", "ad": "Kuşadası Kadınlar Denizi", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 37.8483, "lon": 27.2458, "deniz_temp": 25},
     {"sehir": "Aydın", "ad": "Didim Altınkum Plajı", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 37.3575, "lon": 27.2831, "deniz_temp": 24},
     {"sehir": "Aydın", "ad": "Afrodisias Antik Kenti", "tip": "Kış", "kat": "Kültür & Tarih", "lat": 37.6403, "lon": 28.7233, "deniz_temp": None},
 
-    # 4. MANİSA
+    # MANİSA
     {"sehir": "Manisa", "ad": "Spil Dağı Milli Parkı", "tip": "Yaz", "kat": "Doğa Yürüyüşü", "lat": 38.5601, "lon": 27.4485, "deniz_temp": None},
     {"sehir": "Manisa", "ad": "Kula Volkanik Jeoparkı", "tip": "Yaz", "kat": "Doğa Gezisi", "lat": 38.5828, "lon": 28.6142, "deniz_temp": None},
     {"sehir": "Manisa", "ad": "Sardes Antik Kenti", "tip": "Kış", "kat": "Kültür & Tarih", "lat": 38.4883, "lon": 28.0403, "deniz_temp": None},
-    {"sehir": "Manisa", "ad": "Kurşunlu Kaplıcaları", "tip": "Kış", "kat": "Termal & Spa", "lat": 38.4528, "lon": 28.1408, "deniz_temp": None},
 
-    # 5. DENİZLİ
+    # DENİZLİ
     {"sehir": "Denizli", "ad": "Pamukkale Travertenleri", "tip": "Yaz", "kat": "Kültür & Doğa", "lat": 37.9249, "lon": 29.1238, "deniz_temp": None},
-    {"sehir": "Denizli", "ad": "Kleopatra Antik Havuzu", "tip": "Yaz", "kat": "Doğal Yüzme", "lat": 37.9268, "lon": 29.1245, "deniz_temp": None},
     {"sehir": "Denizli", "ad": "Karahayıt Termal Tesisleri", "tip": "Kış", "kat": "Termal & Spa", "lat": 37.9622, "lon": 29.1031, "deniz_temp": None},
 
-    # 6. AFYONKARAHİSAR
+    # AFYONKARAHİSAR
     {"sehir": "Afyonkarahisar", "ad": "Frig Vadisi Göynük", "tip": "Yaz", "kat": "Doğa Yürüyüşü", "lat": 39.0285, "lon": 30.5283, "deniz_temp": None},
     {"sehir": "Afyonkarahisar", "ad": "Gazlıgöl Termal Kaplıcaları", "tip": "Kış", "kat": "Termal & Spa", "lat": 38.9388, "lon": 30.5050, "deniz_temp": None},
 
-    # 7. UŞAK
+    # UŞAK
     {"sehir": "Uşak", "ad": "Ulubey Kanyonu (Cam Teras)", "tip": "Yaz", "kat": "Doğa Yürüyüşü", "lat": 38.4230, "lon": 29.2940, "deniz_temp": None},
     {"sehir": "Uşak", "ad": "Kayaağıl Termal Tesisleri", "tip": "Kış", "kat": "Termal & Spa", "lat": 38.6410, "lon": 29.3520, "deniz_temp": None},
 
-    # 8. KÜTAHYA
+    # KÜTAHYA
     {"sehir": "Kütahya", "ad": "Aizanoi Antik Kenti", "tip": "Yaz", "kat": "Kültür & Tarih", "lat": 39.2012, "lon": 29.6120, "deniz_temp": None},
     {"sehir": "Kütahya", "ad": "Yoncalı Termal Kaplıcaları", "tip": "Kış", "kat": "Termal & Spa", "lat": 39.4620, "lon": 29.8650, "deniz_temp": None},
 ]
 
 df_mekanlar = pd.DataFrame(mekanlar)
 
-# İç Ege Hesaplaması
+# İç Ege Kontrolü
 ic_ege = ["Afyonkarahisar", "Kütahya", "Uşak", "Denizli"]
 is_inland = sehir in ic_ege
 
 base_temp = (25 if is_inland else 28) if is_summer else (8 if is_inland else 14)
 sim_temp = base_temp + np.random.randint(-1, 2)
 
-# 1. METRİKLER VE HAVA DURUMU
+# 1. HAVA DURUMU METRİKLERİ
 st.subheader(f"📊 {sehir} İçin {tarih.strftime('%d.%m.%Y')} Hava Durumu")
 cols = st.columns(3)
 if show_temp:
@@ -162,12 +160,11 @@ if show_humidity:
 
 st.divider()
 
-# 2. 7 GÜNLÜK SICAKLIK TAHMİN GRAFİĞİ (YENİ EKLENDİ)
+# 2. 7 GÜNLÜK SICAKLIK TAHMİN GRAFİĞİ
 st.subheader("📈 7 Günlük Sıcaklık Değişim Trendi")
 gunler = [tarih + datetime.timedelta(days=i) for i in range(7)]
 gun_isimleri = [g.strftime("%d %b") for g in gunler]
 
-# Rastgele Gerçekçi Sıcaklık Değişimi
 np.random.seed(len(sehir) + secilen_ay)
 sıcaklıklar = [sim_temp + int(np.random.randint(-2, 3)) for _ in range(7)]
 
@@ -218,8 +215,16 @@ filtered_df = city_df[(city_df["kat"].isin(secilen_kategoriler)) & (city_df["tip
 
 st.divider()
 
-# 4. AKTİVİTE LİSTESİ VE KESİNTİSİZ HARİTA
+# 4. AKTİVİTE LİSTESİ VE DOĞRUDAN GOOGLE MAPS HARİTASI
 col_left, col_right = st.columns([1, 1])
+
+# Seçilen mekanı Google Maps üzerinde göstermek için session_state kullanımı
+if "selected_place" not in st.session_state or st.session_state.get("current_city") != sehir:
+    if not filtered_df.empty:
+        st.session_state["selected_place"] = filtered_df.iloc[0]["ad"]
+        st.session_state["selected_lat"] = filtered_df.iloc[0]["lat"]
+        st.session_state["selected_lon"] = filtered_df.iloc[0]["lon"]
+    st.session_state["current_city"] = sehir
 
 with col_left:
     st.subheader(f"📌 Önerilen Aktiviteler ({len(filtered_df)})")
@@ -237,7 +242,14 @@ with col_left:
                 </a>
             </div>
             """, unsafe_allow_html=True)
-            
+
+            # Haritada Odaklan Butonu
+            if st.button(f"🗺️ Haritada {row['ad']} Konumuna Odaklan", key=f"btn_{idx}"):
+                st.session_state["selected_place"] = row["ad"]
+                st.session_state["selected_lat"] = row["lat"]
+                st.session_state["selected_lon"] = row["lon"]
+                st.rerun()
+
             if is_summer and row['deniz_temp'] is not None:
                 st.markdown(f"""
                 <div class="sea-temp-box">
@@ -246,26 +258,27 @@ with col_left:
                 """, unsafe_allow_html=True)
             st.write("")
     else:
-        st.warning("Seçtiğiniz kriterlere uygun aktivite bulunamadı. Lütfen yukarıdan farklı bir aktivite türü seçin.")
+        st.warning("Seçtiğiniz kriterlere uygun aktivite bulunamadı.")
 
 with col_right:
-    st.subheader("🗺️ Canlı Harita Görünümü")
-    if not filtered_df.empty:
-        # Sorunsuz Çalışan Open-Street-Map Stili
-        fig_map = px.scatter_mapbox(
-            filtered_df,
-            lat="lat",
-            lon="lon",
-            hover_name="ad",
-            hover_data=["kat"],
-            color="kat",
-            color_discrete_sequence=["#059669", "#0284c7", "#10b981", "#0284c7"],
-            zoom=8,
-            height=480
-        )
-        fig_map.update_layout(
-            mapbox_style="open-street-map",
-            margin={"r":0, "t":0, "l":0, "b":0},
-            legend=dict(orient="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
-        )
-        st.plotly_chart(fig_map, use_container_width=True)
+    st.subheader("🗺️ Canlı Google Maps Görünümü")
+    if "selected_lat" in st.session_state:
+        lat = st.session_state["selected_lat"]
+        lon = st.session_state["selected_lon"]
+        place_name = st.session_state["selected_place"]
+        
+        st.info(f"📍 Şu An Haritada Odaklanan Mekan: **{place_name}**")
+        
+        # Google Maps Embed HTML iframe Kodu
+        google_maps_html = f"""
+        <iframe 
+            width="100%" 
+            height="460" 
+            frameborder="0" 
+            scrolling="no" 
+            marginheight="0" 
+            marginwidth="0" 
+            src="https://maps.google.com/maps?q={lat},{lon}&hl=tr&z=13&output=embed">
+        </iframe>
+        """
+        components.html(google_maps_html, height=470)
