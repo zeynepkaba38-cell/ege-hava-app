@@ -7,7 +7,7 @@ import datetime
 
 # 1. Sayfa Ayarları
 st.set_page_config(
-    page_title="EgeHava - Tüm Ege Bölgesi Akıllı Rehberi",
+    page_title="EgeHava - Akıllı Ege Rehberi",
     page_icon="🌿",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -16,11 +16,9 @@ st.set_page_config(
 # 2. Doğal Yeşil & Mavi Renk Paleti (CSS)
 st.markdown("""
 <style>
-    /* Arka Plan */
     .stApp {
         background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%);
     }
-    /* Kart Tasarımları - Orman Yeşili Barlı */
     .activity-card {
         background: #ffffff;
         border-radius: 12px;
@@ -29,7 +27,6 @@ st.markdown("""
         border-left: 6px solid #059669;
         box-shadow: 0 4px 12px rgba(5, 150, 105, 0.08);
     }
-    /* Deniz Sıcaklığı Kutusu - Deniz Mavisi */
     .sea-temp-box {
         background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
         color: #ffffff;
@@ -39,7 +36,6 @@ st.markdown("""
         font-weight: 700;
         box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25);
     }
-    /* Yol Tarifi Butonu */
     .gmaps-btn {
         background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         color: white !important;
@@ -75,7 +71,7 @@ with col_logo:
 
 with col_title:
     st.title("EgeHava & 8 Şehir Akıllı Aktivite Rehberi")
-    st.caption("Çoklu Otomatik Aktivite Önerileri | Google Maps Entegrasyonu | Yeşil & Mavi Tema")
+    st.caption("Çoklu Plaj Önerileri | Otomatik Tarih & Şehir Analizi | Google Maps Entegrasyonu")
 
 st.divider()
 
@@ -88,7 +84,7 @@ ege_sehırleri = [
 sehir = st.sidebar.selectbox("Şehir Seçin", ege_sehırleri)
 tarih = st.sidebar.date_input("Tarih Seçin", datetime.date.today())
 
-# Mevsim Tespiti (Mayıs - Eylül: Yaz, Diğerleri: Kış)
+# Seçilen Tarihten Mevsim Tespiti (Mayıs - Eylül: Yaz)
 secilen_ay = tarih.month
 is_summer = secilen_ay in [5, 6, 7, 8, 9]
 
@@ -98,57 +94,69 @@ show_temp = st.sidebar.checkbox("Sıcaklık", value=True)
 show_wind = st.sidebar.checkbox("Rüzgar Hızı", value=True)
 show_humidity = st.sidebar.checkbox("Nem Oranı", value=True)
 
-# VERİ SETİ (8 Şehir)
+# GENİŞLETİLMİŞ VE ÇOKLU PLAJLI VERİ SETİ
 mekanlar = [
-    # İZMİR
+    # 1. İZMİR PLAJLARI VE AKTİVİTELERİ
     {"sehir": "İzmir", "ad": "Çeşme Ilıca Plajı", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 38.3075, "lon": 26.3572, "deniz_temp": 24},
-    {"sehir": "İzmir", "ad": "Alaçatı Rüzgar Sörfü Alanı", "tip": "Yaz", "kat": "Rüzgar Sörfü", "lat": 38.2520, "lon": 26.3880, "deniz_temp": 23},
+    {"sehir": "İzmir", "ad": "Alaçatı Çark Plajı & Sörf", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 38.2520, "lon": 26.3880, "deniz_temp": 23},
+    {"sehir": "İzmir", "ad": "Urla Demircili Plajı", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 38.2389, "lon": 26.7028, "deniz_temp": 22},
+    {"sehir": "İzmir", "ad": "Dikili Bademli Kalem Adası Plajı", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 39.0111, "lon": 26.7861, "deniz_temp": 23},
+    {"sehir": "İzmir", "ad": "Foça Eski Foça Plajı", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 38.6703, "lon": 26.7575, "deniz_temp": 22},
+    {"sehir": "İzmir", "ad": "Seferihisar Akkum Plajı", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 38.1969, "lon": 26.7864, "deniz_temp": 23},
     {"sehir": "İzmir", "ad": "Efes Antik Kenti", "tip": "Kış", "kat": "Kültür & Tarih", "lat": 37.9411, "lon": 27.3419, "deniz_temp": None},
     {"sehir": "İzmir", "ad": "Balçova Termal Tesisleri", "tip": "Kış", "kat": "Termal & Spa", "lat": 38.3892, "lon": 27.0425, "deniz_temp": None},
 
-    # MUĞLA
-    {"sehir": "Muğla", "ad": "Fethiye Ölüdeniz", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 36.5492, "lon": 29.1156, "deniz_temp": 26},
-    {"sehir": "Muğla", "ad": "Akyaka Rüzgar Sörfü Plajı", "tip": "Yaz", "kat": "Rüzgar Sörfü", "lat": 37.0505, "lon": 28.3245, "deniz_temp": 24},
+    # 2. MUĞLA PLAJLARI VE AKTİVİTELERİ
+    {"sehir": "Muğla", "ad": "Fethiye Ölüdeniz Kumburnu Plajı", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 36.5492, "lon": 29.1156, "deniz_temp": 26},
+    {"sehir": "Muğla", "ad": "Marmaris İchmeler Plajı", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 36.8005, "lon": 28.2325, "deniz_temp": 25},
+    {"sehir": "Muğla", "ad": "Bodrum Bitez Plajı", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 37.0308, "lon": 27.3828, "deniz_temp": 25},
+    {"sehir": "Muğla", "ad": "Datça Palamutbükü Plajı", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 36.6711, "lon": 27.5028, "deniz_temp": 24},
+    {"sehir": "Muğla", "ad": "Akyaka Azmak & Plaj Alanı", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 37.0505, "lon": 28.3245, "deniz_temp": 24},
+    {"sehir": "Muğla", "ad": "Dalyan İztuzu Plajı", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 36.7972, "lon": 28.6189, "deniz_temp": 26},
     {"sehir": "Muğla", "ad": "Sultaniye Kaplıcaları", "tip": "Kış", "kat": "Termal & Spa", "lat": 36.9214, "lon": 28.5833, "deniz_temp": None},
     {"sehir": "Muğla", "ad": "Marmaris Kalesi", "tip": "Kış", "kat": "Kültür & Tarih", "lat": 36.8508, "lon": 28.2725, "deniz_temp": None},
 
-    # AYDIN
-    {"sehir": "Aydın", "ad": "Kuşadası Kadınlar Denizi", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 37.8483, "lon": 27.2458, "deniz_temp": 25},
+    # 3. AYDIN PLAJLARI VE AKTİVİTELERİ
+    {"sehir": "Aydın", "ad": "Kuşadası Kadınlar Denizi Plajı", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 37.8483, "lon": 27.2458, "deniz_temp": 25},
     {"sehir": "Aydın", "ad": "Didim Altınkum Plajı", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 37.3575, "lon": 27.2831, "deniz_temp": 24},
+    {"sehir": "Aydın", "ad": "Kuşadası Sevgi Plajı", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 37.7619, "lon": 27.2622, "deniz_temp": 25},
+    {"sehir": "Aydın", "ad": "Dilek Yarımadası İçmeler Koyu", "tip": "Yaz", "kat": "Plaj & Deniz", "lat": 37.7125, "lon": 27.1583, "deniz_temp": 24},
     {"sehir": "Aydın", "ad": "Afrodisias Antik Kenti", "tip": "Kış", "kat": "Kültür & Tarih", "lat": 37.6403, "lon": 28.7233, "deniz_temp": None},
 
-    # MANİSA
+    # 4. MANİSA
     {"sehir": "Manisa", "ad": "Spil Dağı Milli Parkı", "tip": "Yaz", "kat": "Doğa Yürüyüşü", "lat": 38.5601, "lon": 27.4485, "deniz_temp": None},
     {"sehir": "Manisa", "ad": "Kula Volkanik Jeoparkı", "tip": "Yaz", "kat": "Doğa Gezisi", "lat": 38.5828, "lon": 28.6142, "deniz_temp": None},
     {"sehir": "Manisa", "ad": "Sardes Antik Kenti", "tip": "Kış", "kat": "Kültür & Tarih", "lat": 38.4883, "lon": 28.0403, "deniz_temp": None},
+    {"sehir": "Manisa", "ad": "Kurşunlu Kaplıcaları", "tip": "Kış", "kat": "Termal & Spa", "lat": 38.4528, "lon": 28.1408, "deniz_temp": None},
 
-    # DENİZLİ
+    # 5. DENİZLİ
     {"sehir": "Denizli", "ad": "Pamukkale Travertenleri", "tip": "Yaz", "kat": "Kültür & Doğa", "lat": 37.9249, "lon": 29.1238, "deniz_temp": None},
+    {"sehir": "Denizli", "ad": "Kleopatra Antik Havuzu", "tip": "Yaz", "kat": "Doğal Yüzme", "lat": 37.9268, "lon": 29.1245, "deniz_temp": None},
     {"sehir": "Denizli", "ad": "Karahayıt Termal Tesisleri", "tip": "Kış", "kat": "Termal & Spa", "lat": 37.9622, "lon": 29.1031, "deniz_temp": None},
 
-    # AFYONKARAHİSAR
+    # 6. AFYONKARAHİSAR
     {"sehir": "Afyonkarahisar", "ad": "Frig Vadisi Göynük", "tip": "Yaz", "kat": "Doğa Yürüyüşü", "lat": 39.0285, "lon": 30.5283, "deniz_temp": None},
     {"sehir": "Afyonkarahisar", "ad": "Gazlıgöl Termal Kaplıcaları", "tip": "Kış", "kat": "Termal & Spa", "lat": 38.9388, "lon": 30.5050, "deniz_temp": None},
 
-    # UŞAK
+    # 7. UŞAK
     {"sehir": "Uşak", "ad": "Ulubey Kanyonu (Cam Teras)", "tip": "Yaz", "kat": "Doğa Yürüyüşü", "lat": 38.4230, "lon": 29.2940, "deniz_temp": None},
     {"sehir": "Uşak", "ad": "Kayaağıl Termal Tesisleri", "tip": "Kış", "kat": "Termal & Spa", "lat": 38.6410, "lon": 29.3520, "deniz_temp": None},
 
-    # KÜTAHYA
+    # 8. KÜTAHYA
     {"sehir": "Kütahya", "ad": "Aizanoi Antik Kenti", "tip": "Yaz", "kat": "Kültür & Tarih", "lat": 39.2012, "lon": 29.6120, "deniz_temp": None},
     {"sehir": "Kütahya", "ad": "Yoncalı Termal Kaplıcaları", "tip": "Kış", "kat": "Termal & Spa", "lat": 39.4620, "lon": 29.8650, "deniz_temp": None},
 ]
 
 df_mekanlar = pd.DataFrame(mekanlar)
 
-# İç Ege Kontrolü
+# İç Ege Hesaplaması
 ic_ege = ["Afyonkarahisar", "Kütahya", "Uşak", "Denizli"]
 is_inland = sehir in ic_ege
 
 base_temp = (25 if is_inland else 28) if is_summer else (8 if is_inland else 14)
 sim_temp = base_temp + np.random.randint(-1, 2)
 
-# 1. HAVA DURUMU METRİKLERİ
+# 1. METRİKLER VE HAVA DURUMU
 st.subheader(f"📊 {sehir} İçin {tarih.strftime('%d.%m.%Y')} Hava Durumu")
 cols = st.columns(3)
 if show_temp:
@@ -190,42 +198,41 @@ st.plotly_chart(fig_temp, use_container_width=True)
 
 st.divider()
 
-# 3. BİRDEN FAZLA OTOMATİK AKTİVİTE ÖNERİ MANTIĞI
+# 3. SEÇİLEN TARİHE VE ŞEHRE GÖRE DİNAMİK/OTOMATİK ÖNERİ
 city_df = df_mekanlar[df_mekanlar["sehir"] == sehir]
 
-# Mevsime uygun olan TÜM kategorileri tespit et (Birden Fazla Otomatik Öneri)
+# Mevsime ve Şehre Göre Uygun Tüm Kategorileri Otomatik Seç
 mevsim_tipi = "Yaz" if is_summer else "Kış"
 otomatik_kategoriler = list(city_df[city_df["tip"] == mevsim_tipi]["kat"].unique())
 
-# Tüm kategorilerin listesi
+# Filtre Seçim Listesi İçin Tüm Şehir Kategorileri
 tum_kategoriler = list(city_df["kat"].unique())
 
-st.subheader("🎯 Hava Durumuna Göre Akıllı Aktivite Önerileri")
+st.subheader(f"🎯 {sehir} İçin Otomatik Önerilen Aktiviteler ve Plajlar")
 col_sel1, col_sel2 = st.columns([2, 1])
 
 with col_sel1:
     secilen_kategoriler = st.multiselect(
-        "Tarih/Hava durumuna göre otomatik seçilen aktivite türleri (Değiştirebilirsiniz):",
+        f"Seçilen Tarihe ({tarih.strftime('%d.%m.%Y')}) Göre Otomatik Seçilen Kategoriler:",
         options=tum_kategoriler,
-        default=otomatik_kategoriler  # BİRDEN FAZLA KATEGORİ OTOMATİK SEÇİLİR
+        default=otomatik_kategoriler  # OTOMATİK OLARAK BİRDEN FAZLA PLAJ/AKTİVİTE GELİR
     )
 
 with col_sel2:
-    st.write("**Mevsimsel Öneri Durumu:**")
+    st.write("**Mevsimsel Analiz:**")
     if is_summer:
-        st.success(f"☀️ Yaz Modu: {len(otomatik_kategoriler)} Farklı Aktivite Türü Öneriliyor")
+        st.success(f"☀️ Yaz Modu: {sehir} için uygun plajlar ve yazlık aktiviteler getirildi.")
     else:
-        st.info(f"❄️ Kış Modu: {len(otomatik_kategoriler)} Farklı Aktivite Türü Öneriliyor")
+        st.info(f"❄️ Kış Modu: {sehir} için kültür ve termal/spa alanları getirildi.")
 
-# Filtrelenmiş Liste
 filtered_df = city_df[city_df["kat"].isin(secilen_kategoriler)]
 
 st.divider()
 
-# 4. AKTİVİTE LİSTESİ VE DOĞRUDAN GOOGLE MAPS HARİTASI
+# 4. AKTİVİTE VE PLAJ LİSTESİ + GOOGLE MAPS HARİTASI
 col_left, col_right = st.columns([1, 1])
 
-# Seçilen mekanı Google Maps üzerinde göstermek için session_state kullanımı
+# Session state reset mantığı
 if "selected_place" not in st.session_state or st.session_state.get("current_city") != sehir:
     if not filtered_df.empty:
         st.session_state["selected_place"] = filtered_df.iloc[0]["ad"]
@@ -234,7 +241,7 @@ if "selected_place" not in st.session_state or st.session_state.get("current_cit
     st.session_state["current_city"] = sehir
 
 with col_left:
-    st.subheader(f"📌 Önerilen Aktiviteler ({len(filtered_df)})")
+    st.subheader(f"📌 Önerilen Plaj ve Aktiviteler ({len(filtered_df)} Adet)")
 
     if not filtered_df.empty:
         for idx, row in filtered_df.iterrows():
@@ -265,16 +272,16 @@ with col_left:
                 """, unsafe_allow_html=True)
             st.write("")
     else:
-        st.warning("Seçtiğiniz kriterlere uygun aktivite bulunamadı. Lütfen filtreleme alanından başka bir kategori ekleyin.")
+        st.warning("Seçtiğiniz kriterlere uygun sonuç bulunamadı. Lütfen yukarıdan farklı bir kategori ekleyin.")
 
 with col_right:
     st.subheader("🗺️ Canlı Google Maps Görünümü")
-    if "selected_lat" in st.session_state:
+    if "selected_lat" in st.session_state and not filtered_df.empty:
         lat = st.session_state["selected_lat"]
         lon = st.session_state["selected_lon"]
         place_name = st.session_state["selected_place"]
         
-        st.info(f"📍 Şu An Haritada Odaklanan Mekan: **{place_name}**")
+        st.info(f"📍 Haritada Gösterilen Mekan: **{place_name}**")
         
         # Google Maps Embed HTML iframe Kodu
         google_maps_html = f"""
